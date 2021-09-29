@@ -145,6 +145,14 @@ string_appendn (string *p, const char *s, size_t n)
 }
 
 static void
+string_appendc (string *p, char c)
+{
+  string_need (p, 1);
+  *p->p = c;
+  p->p++;
+}
+
+static void
 string_prependn (string *p, const char *s, size_t n)
 {
   char *q;
@@ -664,7 +672,7 @@ dlang_function_type (string *decl, const char *mangled, struct dlang_info *info)
   /* Append to decl in order. */
   string_appendn (decl, type.b, string_length (&type));
   string_appendn (decl, args.b, string_length (&args));
-  string_append (decl, " ");
+  string_appendc (decl, ' ');
   string_appendn (decl, attr.b, string_length (&attr));
 
   string_delete (&attr);
@@ -816,9 +824,9 @@ dlang_type (string *decl, const char *mangled, struct dlang_info *info)
 	  mangled++;
 	}
       mangled = dlang_type (decl, mangled, info);
-      string_append (decl, "[");
+      string_appendc (decl, '[');
       string_appendn (decl, numptr, num);
-      string_append (decl, "]");
+      string_appendc (decl, ']');
       return mangled;
     }
     case 'H': /* associative array (T[T]) */
@@ -832,9 +840,9 @@ dlang_type (string *decl, const char *mangled, struct dlang_info *info)
       sztype = string_length (&type);
 
       mangled = dlang_type (decl, mangled, info);
-      string_append (decl, "[");
+      string_appendc (decl, '[');
       string_appendn (decl, type.b, sztype);
-      string_append (decl, "]");
+      string_appendc (decl, ']');
 
       string_delete (&type);
       return mangled;
@@ -844,7 +852,7 @@ dlang_type (string *decl, const char *mangled, struct dlang_info *info)
       if (!dlang_call_convention_p (mangled))
 	{
 	  mangled = dlang_type (decl, mangled, info);
-	  string_append (decl, "*");
+	  string_appendc (decl, '*');
 	  return mangled;
 	}
       /* Fall through */
@@ -1181,7 +1189,7 @@ dlang_parse_integer (string *decl, const char *mangled, char type)
 	{
 	  /* Represent as a character literal.  */
 	  char c = (char) val;
-	  string_appendn (decl, &c, 1);
+	  string_appendc (decl, c);
 	}
       else
 	{
@@ -1297,7 +1305,7 @@ dlang_parse_real (string *decl, const char *mangled)
   /* Hexadecimal prefix and leading bit.  */
   if (*mangled == 'N')
     {
-      string_append (decl, "-");
+      string_appendc (decl, '-');
       mangled++;
     }
 
@@ -1305,14 +1313,14 @@ dlang_parse_real (string *decl, const char *mangled)
     return NULL;
 
   string_append (decl, "0x");
-  string_appendn (decl, mangled, 1);
-  string_append (decl, ".");
+  string_appendc (decl, *mangled);
+  string_appendc (decl, '.');
   mangled++;
 
   /* Significand.  */
   while (ISXDIGIT (*mangled))
     {
-      string_appendn (decl, mangled, 1);
+      string_appendc (decl, *mangled);
       mangled++;
     }
 
@@ -1325,7 +1333,7 @@ dlang_parse_real (string *decl, const char *mangled)
 
   if (*mangled == 'N')
     {
-      string_append (decl, "-");
+      string_appendc (decl, '-');
       mangled++;
     }
 
@@ -1352,7 +1360,7 @@ dlang_parse_string (string *decl, const char *mangled)
     return NULL;
 
   mangled++;
-  string_append (decl, "\"");
+  string_appendc (decl, '\"');
   while (len--)
     {
       char val;
@@ -1365,7 +1373,7 @@ dlang_parse_string (string *decl, const char *mangled)
       switch (val)
 	{
 	case ' ':
-	  string_append (decl, " ");
+	  string_appendc (decl, ' ');
 	  break;
 	case '\t':
 	  string_append (decl, "\\t");
@@ -1415,7 +1423,7 @@ dlang_parse_arrayliteral (string *decl, const char *mangled,
   if (mangled == NULL)
     return NULL;
 
-  string_append (decl, "[");
+  string_appendc (decl, '[');
   while (elements--)
     {
       mangled = dlang_value (decl, mangled, NULL, '\0', info);
@@ -1426,7 +1434,7 @@ dlang_parse_arrayliteral (string *decl, const char *mangled,
 	string_append (decl, ", ");
     }
 
-  string_append (decl, "]");
+  string_appendc (decl, ']');
   return mangled;
 }
 
@@ -1442,14 +1450,14 @@ dlang_parse_assocarray (string *decl, const char *mangled,
   if (mangled == NULL)
     return NULL;
 
-  string_append (decl, "[");
+  string_appendc (decl, '[');
   while (elements--)
     {
       mangled = dlang_value (decl, mangled, NULL, '\0', info);
       if (mangled == NULL)
 	return NULL;
 
-      string_append (decl, ":");
+      string_appendc (decl, ':');
       mangled = dlang_value (decl, mangled, NULL, '\0', info);
       if (mangled == NULL)
 	return NULL;
@@ -1458,7 +1466,7 @@ dlang_parse_assocarray (string *decl, const char *mangled,
 	string_append (decl, ", ");
     }
 
-  string_append (decl, "]");
+  string_appendc (decl, ']');
   return mangled;
 }
 
@@ -1477,7 +1485,7 @@ dlang_parse_structlit (string *decl, const char *mangled, const char *name,
   if (name != NULL)
     string_append (decl, name);
 
-  string_append (decl, "(");
+  string_appendc (decl, '(');
   while (args--)
     {
       mangled = dlang_value (decl, mangled, NULL, '\0', info);
@@ -1488,7 +1496,7 @@ dlang_parse_structlit (string *decl, const char *mangled, const char *name,
 	string_append (decl, ", ");
     }
 
-  string_append (decl, ")");
+  string_appendc (decl, ')');
   return mangled;
 }
 
@@ -1512,7 +1520,7 @@ dlang_value (string *decl, const char *mangled, const char *name, char type,
       /* Integral values.  */
     case 'N':
       mangled++;
-      string_append (decl, "-");
+      string_appendc (decl, '-');
       mangled = dlang_parse_integer (decl, mangled, type);
       break;
 
@@ -1538,12 +1546,12 @@ dlang_value (string *decl, const char *mangled, const char *name, char type,
     case 'c':
       mangled++;
       mangled = dlang_parse_real (decl, mangled);
-      string_append (decl, "+");
+      string_appendc (decl, '+');
       if (mangled == NULL || *mangled != 'c')
 	return NULL;
       mangled++;
       mangled = dlang_parse_real (decl, mangled);
-      string_append (decl, "i");
+      string_appendc (decl, 'i');
       break;
 
       /* String values.  */
@@ -1651,7 +1659,7 @@ dlang_parse_qualified (string *decl, const char *mangled,
   do
     {
       if (n++)
-	string_append (decl, ".");
+	string_appendc (decl, '.');
 
       /* Skip over anonymous symbols.  */
       while (*mangled == '0')
@@ -1723,7 +1731,7 @@ dlang_parse_tuple (string *decl, const char *mangled, struct dlang_info *info)
 	string_append (decl, ", ");
     }
 
-  string_append (decl, ")");
+  string_appendc (decl, ')');
   return mangled;
 }
 
