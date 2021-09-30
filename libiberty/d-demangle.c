@@ -774,30 +774,26 @@ dlang_type (string *decl, const char *mangled, struct dlang_info *info)
       return mangled;
     case 'N':
       mangled++;
-      if (*mangled == 'g') /* wild(T) */
-	{
-	  mangled++;
-	  string_append (decl, "inout(");
-	  mangled = dlang_type (decl, mangled, info);
-	  string_append (decl, ")");
-	  return mangled;
-	}
-      else if (*mangled == 'h') /* vector(T) */
-	{
-	  mangled++;
-	  string_append (decl, "__vector(");
-	  mangled = dlang_type (decl, mangled, info);
-	  string_append (decl, ")");
-	  return mangled;
-	}
-      else if (*mangled == 'n') /* typeof(*null) */
-	{
-	  mangled++;
-	  string_append (decl, "typeof(*null)");
-	  return mangled;
-	}
-      else
-	return NULL;
+      switch (*mangled)
+      {
+	case 'g': /* wild(T) */
+	    mangled++;
+	    string_append (decl, "inout(");
+	    mangled = dlang_type (decl, mangled, info);
+	    string_append (decl, ")");
+	    return mangled;
+	case 'h': /* vector(T) */
+	    mangled++;
+	    string_append (decl, "__vector(");
+	    mangled = dlang_type (decl, mangled, info);
+	    string_append (decl, ")");
+	    return mangled;
+	case 'n': /* typeof(*null) */
+	    mangled++;
+	    string_append (decl, "typeof(*null)");
+	    return mangled;
+      }
+      return NULL;
     case 'A': /* dynamic array (T[]) */
       mangled++;
       mangled = dlang_type (decl, mangled, info);
