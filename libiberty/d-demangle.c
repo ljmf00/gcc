@@ -1711,7 +1711,7 @@ dlang_parse_tuple (string *decl, const char *mangled, struct dlang_info *info)
   if (mangled == NULL)
     return NULL;
 
-  string_append (decl, "Tuple!(");
+  string_append (decl, "tuple(");
 
   while (elements--)
     {

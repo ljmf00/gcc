@@ -367,27 +367,27 @@ demangle.test(char, char)
 #
 --format=dlang
 _D8demangle4testFB0Zv
-demangle.test(Tuple!())
+demangle.test(tuple())
 #
 --format=dlang
 _D8demangle4testFB1aZv
-demangle.test(Tuple!(char))
+demangle.test(tuple(char))
 #
 --format=dlang
 _D8demangle4testFB2aaZv
-demangle.test(Tuple!(char, char))
+demangle.test(tuple(char, char))
 #
 --format=dlang
 _D8demangle4testFB3aaaZv
-demangle.test(Tuple!(char, char, char))
+demangle.test(tuple(char, char, char))
 #
 --format=dlang
 _D8demangle4testFB2OaaZv
-demangle.test(Tuple!(shared(char), char))
+demangle.test(tuple(shared(char), char))
 #
 --format=dlang
 _D8demangle4testFB3aDFZaaZv
-demangle.test(Tuple!(char, char() delegate, char))
+demangle.test(tuple(char, char() delegate, char))
 #
 --format=dlang
 _D8demangle4testFDFZaZv
